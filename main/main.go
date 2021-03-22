@@ -3,11 +3,15 @@ package main
 import (
     "encoding/json"
     "fmt"
+    "github.com/JulianSauer/Weather-Station-Pi/sns"
     "github.com/JulianSauer/Weather-Station-Pi/weather"
 )
 
 func main() {
-
+    data := collectData()
+    for _, d := range data {
+        sns.Publish(d)
+    }
 }
 
 func collectData() []string {
