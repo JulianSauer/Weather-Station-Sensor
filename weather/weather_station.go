@@ -71,7 +71,7 @@ func disconnect(connection *ipconnection.IPConnection) {
 
 func convertWeatherData(timestamp time.Time, temperature int16, humidity uint8, windSpeed uint32, gustSpeed uint32, rain uint32, windDirection outdoor_weather_bricklet.WindDirection) dto.WeatherData {
     return dto.WeatherData{
-        Timestamp:     timestamp,
+        Timestamp:     timestamp.Format("2006-01-02 15:04:05"),
         Temperature:   float64(temperature) / 10.0,
         Humidity:      humidity,
         WindSpeed:     float64(windSpeed) / 10.0,
