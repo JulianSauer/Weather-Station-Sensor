@@ -2,6 +2,7 @@ package weather
 
 import (
     "fmt"
+    config "github.com/JulianSauer/Weather-Station-Pi/config"
     "github.com/JulianSauer/Weather-Station-Pi/dto"
     "github.com/Tinkerforge/go-api-bindings/ipconnection"
     "github.com/Tinkerforge/go-api-bindings/outdoor_weather_bricklet"
@@ -9,13 +10,15 @@ import (
     "time"
 )
 
-const ADDRESS string = ""
-const UID string = ""
-
+var address string
+var uid string
 var location *time.Location
 var identifiers []uint8
 
 func init() {
+    configuration := config.Load()
+    address = configuration.WeatherStationAddress + ":" + configuration.WeatherStationPort
+    uid = configuration.WeatherStationUID
     location, _ = time.LoadLocation("Europe/Berlin")
     outdoorWeatherBricklet, connection := reconnect()
     defer disconnect(connection)
@@ -48,13 +51,13 @@ func GetWeatherData() []dto.WeatherData {
 
 func reconnect() (*outdoor_weather_bricklet.OutdoorWeatherBricklet, *ipconnection.IPConnection) {
     connection := ipconnection.New()
-    outdoorWeatherBricklet, e := outdoor_weather_bricklet.New(UID, &connection)
+    outdoorWeatherBricklet, e := outdoor_weather_bricklet.New(uid, &connection)
     if e != nil {
         fmt.Println(e.Error())
         os.Exit(1)
     }
 
-    if e = connection.Connect(ADDRESS); e != nil {
+    if e = connection.Connect(address); e != nil {
         fmt.Println(e.Error())
         os.Exit(1)
     }
