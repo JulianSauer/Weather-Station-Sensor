@@ -33,6 +33,7 @@ func Publish(message string) {
     result, e := client.Publish(input)
     if e != nil {
         fmt.Println(e.Error())
+    } else {
+        fmt.Printf("%s: %s\n", *result.MessageId, message)
     }
-    fmt.Println(result)
 }
