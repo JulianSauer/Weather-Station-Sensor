@@ -20,6 +20,7 @@ func init() {
     address = configuration.WeatherStationAddress + ":" + configuration.WeatherStationPort
     uid = configuration.WeatherStationUID
     location, _ = time.LoadLocation("Europe/Berlin")
+    fmt.Println("Connecting to weather sensor")
     outdoorWeatherBricklet, connection := reconnect()
     defer disconnect(connection)
     var e error
@@ -58,7 +59,7 @@ func reconnect() (*outdoor_weather_bricklet.OutdoorWeatherBricklet, *ipconnectio
     }
 
     if e = connection.Connect(address); e != nil {
-        fmt.Println(e.Error())
+        fmt.Printf("Could not connect to weather sensor: %s", e.Error())
         os.Exit(1)
     }
     return &outdoorWeatherBricklet, &connection

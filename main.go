@@ -3,6 +3,7 @@ package main
 import (
     "encoding/json"
     "fmt"
+    "github.com/JulianSauer/Weather-Station-Pi/cache"
     "github.com/JulianSauer/Weather-Station-Pi/config"
     "github.com/JulianSauer/Weather-Station-Pi/sns"
     "github.com/JulianSauer/Weather-Station-Pi/weather"
@@ -15,10 +16,9 @@ func main() {
     cronConfig := config.Load().Cron
     c := cron.New()
     _, e := c.AddFunc(cronConfig, func() {
-        data := collectData()
-        for _, d := range data {
-            sns.Publish(d)
-        }
+        checkCache()
+        messages := collectData()
+        sns.Publish(messages)
     })
     if e != nil {
         fmt.Println(e.Error())
@@ -32,7 +32,7 @@ func main() {
     }
 }
 
-func collectData() []string {
+func collectData() *[]string {
     weatherData := weather.GetWeatherData()
     weatherDataAsJson := make([]string, len(weatherData))
     for i, data := range weatherData {
@@ -42,5 +42,13 @@ func collectData() []string {
         }
         weatherDataAsJson[i] = string(jsonBytes)
     }
-    return weatherDataAsJson
+    return &weatherDataAsJson
+}
+
+func checkCache() {
+    unpublishedMessages := cache.ReadAll()
+    if unpublishedMessages == nil {
+        return
+    }
+    sns.Publish(unpublishedMessages)
 }

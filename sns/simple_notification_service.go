@@ -2,6 +2,7 @@ package sns
 
 import (
     "fmt"
+    "github.com/JulianSauer/Weather-Station-Pi/cache"
     "github.com/JulianSauer/Weather-Station-Pi/config"
     "github.com/aws/aws-sdk-go/aws"
     "github.com/aws/aws-sdk-go/aws/session"
@@ -14,7 +15,7 @@ func init() {
     topic = config.Load().AWSSNSTopic
 }
 
-func Publish(message string) {
+func Publish(messages *[]string) {
     session, e := session.NewSession(&aws.Config{
         Region: aws.String("eu-central-1"),
     })
@@ -25,15 +26,22 @@ func Publish(message string) {
     }
 
     client := sns.New(session)
-    input := &sns.PublishInput{
-        Message:  aws.String(message),
-        TopicArn: aws.String(topic),
-    }
+    var unpublishableMessages []string
+    for _, message := range *messages {
+        input := &sns.PublishInput{
+            Message:  aws.String(message),
+            TopicArn: aws.String(topic),
+        }
 
-    result, e := client.Publish(input)
-    if e != nil {
-        fmt.Println(e.Error())
-    } else {
-        fmt.Printf("%s: %s\n", *result.MessageId, message)
+        result, e := client.Publish(input)
+        if e != nil {
+            fmt.Printf("Cannot publish: %s\n", e.Error())
+            unpublishableMessages = append(unpublishableMessages, message)
+        } else {
+            fmt.Printf("%s: %s\n", *result.MessageId, message)
+        }
+    }
+    if len(unpublishableMessages) > 0 {
+        cache.WriteAll(&unpublishableMessages)
     }
 }
