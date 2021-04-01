@@ -1,0 +1,23 @@
+name: Build binaries
+on: [ push ]
+jobs:
+  publish:
+    name: Build and publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.16.2'
+      - name: Build binaries
+        run: GOOS=linux GOARCH=amd64 go build -o artifacts/weather-station-linux
+      - run: GOOS=windows GOARCH=amd64 go build -o artifacts/weather-station-windows
+      - run: GOOS=darwin GOARCH=amd64 go build -o artifacts/weather-station-darwin
+      - run: GOOS=linux GOARCH=arm go build -o artifacts/weather-station-arm
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: weather-station-artifacts
+          path: artifacts/
