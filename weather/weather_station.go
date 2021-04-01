@@ -31,7 +31,25 @@ func init() {
     }
 }
 
+func BatteryIsLow() bool {
+    fmt.Println("Checking battery")
+    outdoorWeatherBricklet, connection := reconnect()
+    defer disconnect(connection)
+    for _, identifier := range identifiers {
+        _, _, _, _, _, _, batteryLow, _, e := outdoorWeatherBricklet.GetStationData(identifier)
+        if e != nil {
+            fmt.Println(e.Error())
+        }
+
+        if batteryLow {
+            return true
+        }
+    }
+    return false
+}
+
 func GetWeatherData() []dto.WeatherData {
+    fmt.Println("Checking sensor data")
     result := make([]dto.WeatherData, len(identifiers))
     outdoorWeatherBricklet, connection := reconnect()
     defer disconnect(connection)

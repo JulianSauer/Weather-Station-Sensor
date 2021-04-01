@@ -12,10 +12,35 @@ import (
 var topic string
 
 func init() {
-    topic = config.Load().AWSSNSTopic
+    topic = config.Load().AWSSNSWeatherTopic
 }
 
-func Publish(messages *[]string) {
+func PublishLowBattery() {
+    session, e := session.NewSession(&aws.Config{
+        Region: aws.String("eu-central-1"),
+    })
+
+    if e != nil {
+        fmt.Println(e.Error())
+        return
+    }
+
+    client := sns.New(session)
+    input := &sns.PublishInput{
+        Message:  aws.String("Battery is low"),
+        TopicArn: aws.String(topic),
+    }
+
+    result, e := client.Publish(input)
+    if e != nil {
+        fmt.Printf("Cannot publish: %s\n", e.Error())
+
+    } else {
+        fmt.Printf("%s: Battery is low\n", *result.MessageId)
+    }
+}
+
+func PublishSensorData(messages *[]string) {
     session, e := session.NewSession(&aws.Config{
         Region: aws.String("eu-central-1"),
     })

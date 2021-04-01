@@ -12,8 +12,10 @@ type Config struct {
     WeatherStationAddress string `json:"weatherStationAddress"`
     WeatherStationPort    string `json:"weatherStationPort"`
     WeatherStationUID     string `json:"weatherStationUID"`
-    AWSSNSTopic           string `json:"AWS-SNS-Topic"`
+    AWSSNSWeatherTopic    string `json:"AWS-SNS-Weather-Topic"`
+    AWSSNSBatteryTopic    string `json:"AWS-SNS-Battery-Topic"`
     Cron                  string `json:"cron"`
+    CronBattery           string `json:"cronBattery"`
 }
 
 func Load() *Config {

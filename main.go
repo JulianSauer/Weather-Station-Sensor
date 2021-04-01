@@ -13,23 +13,36 @@ import (
 )
 
 func main() {
-    cronConfig := config.Load().Cron
+    cronConfig := config.Load()
     c := cron.New()
-    _, e := c.AddFunc(cronConfig, func() {
+
+    _, e := c.AddFunc(cronConfig.Cron, func() {
         checkCache()
         messages := collectData()
-        sns.Publish(messages)
+        sns.PublishSensorData(messages)
     })
     if e != nil {
         fmt.Println(e.Error())
-    } else {
-        c.Start()
-        fmt.Printf("Starting cron job: %s\n", cronConfig)
-        fmt.Println("Hit ctrl+c to stop")
-        sig := make(chan os.Signal)
-        signal.Notify(sig, os.Interrupt, os.Kill)
-        <-sig
+        return
     }
+
+    _, e = c.AddFunc(cronConfig.CronBattery, func() {
+        if weather.BatteryIsLow() {
+            sns.PublishLowBattery()
+        }
+    })
+    if e != nil {
+        fmt.Println(e.Error())
+        return
+    }
+
+    c.Start()
+    fmt.Printf("Starting cron job: %s\n", cronConfig.Cron)
+    fmt.Printf("Starting cron job: %s\n", cronConfig.CronBattery)
+    fmt.Println("Hit ctrl+c to stop")
+    sig := make(chan os.Signal)
+    signal.Notify(sig, os.Interrupt, os.Kill)
+    <-sig
 }
 
 func collectData() *[]string {
@@ -50,5 +63,5 @@ func checkCache() {
     if unpublishedMessages == nil {
         return
     }
-    sns.Publish(unpublishedMessages)
+    sns.PublishSensorData(unpublishedMessages)
 }
