@@ -89,13 +89,16 @@ func disconnect(connection *ipconnection.IPConnection) {
 }
 
 func convertWeatherData(timestamp time.Time, temperature int16, humidity uint8, windSpeed uint32, gustSpeed uint32, rain uint32, windDirection outdoor_weather_bricklet.WindDirection) dto.WeatherData {
+    t := timestamp.Format("20060102-150405")
     return dto.WeatherData{
-        Timestamp:     timestamp.Format("20060102-150405"),
-        Temperature:   float64(temperature) / 10.0,
-        Humidity:      humidity,
-        WindSpeed:     float64(windSpeed) / 10.0,
-        GustSpeed:     float64(gustSpeed) / 10.0,
-        Rain:          float64(rain) / 10.0,
-        WindDirection: float32(windDirection) * 22.5, // Convert to degrees
+        Source:        "WeatherStation",
+        Timestamp:     t,
+        DataFor:       []string{t},
+        Temperature:   []string{fmt.Sprintf("%.1f", float64(temperature)/10.0)},
+        Humidity:      []string{string(humidity)},
+        WindSpeed:     []string{fmt.Sprintf("%.1f", float64(windSpeed)/10.0)},
+        GustSpeed:     []string{fmt.Sprintf("%.1f", float64(gustSpeed)/10.0)},
+        Rain:          []string{fmt.Sprintf("%.1f", float64(rain)/10.0)},
+        WindDirection: []string{fmt.Sprintf("%.1f", float32(windDirection)*22.5)}, // Convert to degrees
     }
 }
