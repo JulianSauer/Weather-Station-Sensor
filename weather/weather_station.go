@@ -23,6 +23,9 @@ func init() {
     fmt.Println("Connecting to weather sensor")
     outdoorWeatherBricklet, connection := reconnect()
     defer disconnect(connection)
+    if outdoorWeatherBricklet == nil || connection == nil {
+        return
+    }
     var e error
     identifiers, e = outdoorWeatherBricklet.GetStationIdentifiers()
     if e != nil {
@@ -35,6 +38,9 @@ func BatteryIsLow() bool {
     fmt.Println("Checking battery")
     outdoorWeatherBricklet, connection := reconnect()
     defer disconnect(connection)
+    if outdoorWeatherBricklet == nil || connection == nil {
+        return false
+    }
     for _, identifier := range identifiers {
         _, _, _, _, _, _, batteryLow, _, e := outdoorWeatherBricklet.GetStationData(identifier)
         if e != nil {
@@ -53,6 +59,9 @@ func GetWeatherData() []dto.WeatherData {
     result := make([]dto.WeatherData, len(identifiers))
     outdoorWeatherBricklet, connection := reconnect()
     defer disconnect(connection)
+    if outdoorWeatherBricklet == nil || connection == nil {
+        return nil
+    }
     for i, identifier := range identifiers {
         temperature, humidity, windSpeed, gustSpeed, rain, windDirection, batteryLow, _, e := outdoorWeatherBricklet.GetStationData(identifier)
         if e != nil {
@@ -78,7 +87,7 @@ func reconnect() (*outdoor_weather_bricklet.OutdoorWeatherBricklet, *ipconnectio
 
     if e = connection.Connect(address); e != nil {
         fmt.Printf("Could not connect to weather sensor: %s", e.Error())
-        os.Exit(1)
+        return nil, nil
     }
     return &outdoorWeatherBricklet, &connection
 }

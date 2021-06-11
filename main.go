@@ -19,7 +19,9 @@ func main() {
     _, e := c.AddFunc(cronConfig.Cron, func() {
         checkCache()
         messages := collectData()
-        sns.PublishSensorData(messages)
+        if messages != nil {
+            sns.PublishSensorData(messages)
+        }
     })
     if e != nil {
         fmt.Println(e.Error())
@@ -47,6 +49,9 @@ func main() {
 
 func collectData() *[]string {
     weatherData := weather.GetWeatherData()
+    if weatherData == nil {
+        return nil
+    }
     weatherDataAsJson := make([]string, len(weatherData))
     for i, data := range weatherData {
         jsonBytes, e := json.Marshal(data)
