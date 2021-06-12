@@ -52,13 +52,20 @@ func collectData() *[]string {
     if weatherData == nil {
         return nil
     }
-    weatherDataAsJson := make([]string, len(weatherData))
-    for i, data := range weatherData {
-        jsonBytes, e := json.Marshal(data)
+    weatherDataAsJson := make([]string, len(weatherData) * 2)
+    for i := 0; i + 1 < len(weatherDataAsJson); i += 2 {
+        jsonBytes, e := json.Marshal(weatherData[i])
         if e != nil {
             fmt.Println(e.Error())
         }
         weatherDataAsJson[i] = string(jsonBytes)
+
+        weatherData[i].Timestamp = "latest"
+        jsonBytes, e = json.Marshal(weatherData[i])
+        if e != nil {
+            fmt.Println(e.Error())
+        }
+        weatherDataAsJson[i + 1] = string(jsonBytes)
     }
     return &weatherDataAsJson
 }
