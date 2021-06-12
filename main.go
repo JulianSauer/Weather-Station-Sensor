@@ -10,9 +10,13 @@ import (
     "github.com/robfig/cron/v3"
     "os"
     "os/signal"
+    "time"
 )
 
 func main() {
+    location, _ := time.LoadLocation("Europe/Berlin")
+    time.Now().In(location).Format("02 January 2006 15:04:05")
+    fmt.Printf("Starting Weather Station at %s\n", )
     cronConfig := config.Load()
     c := cron.New()
 
