@@ -1,6 +1,7 @@
 package weather
 
 import (
+    "errors"
     "fmt"
     "github.com/JulianSauer/Weather-Station-Pi/config"
     "github.com/JulianSauer/Weather-Station-Pi/dto"
@@ -34,47 +35,43 @@ func init() {
     }
 }
 
-func BatteryIsLow() bool {
+func BatteryIsLow() (bool, error) {
     fmt.Println("Checking battery")
     outdoorWeatherBricklet, connection := reconnect()
     defer disconnect(connection)
     if outdoorWeatherBricklet == nil || connection == nil {
-        return false
+        return false, errors.New("could not connect to weather station")
     }
     for _, identifier := range identifiers {
         _, _, _, _, _, _, batteryLow, _, e := outdoorWeatherBricklet.GetStationData(identifier)
         if e != nil {
-            fmt.Println(e.Error())
+            return false, e
         }
 
         if batteryLow {
-            return true
+            return true, nil
         }
     }
-    return false
+    return false, nil
 }
 
-func GetWeatherData() []dto.WeatherData {
+func GetWeatherData() ([]dto.WeatherData, error) {
     fmt.Println("Checking sensor data")
     result := make([]dto.WeatherData, len(identifiers))
     outdoorWeatherBricklet, connection := reconnect()
     defer disconnect(connection)
     if outdoorWeatherBricklet == nil || connection == nil {
-        return nil
+        return nil, errors.New("could not connect to weather station")
     }
     for i, identifier := range identifiers {
-        temperature, humidity, windSpeed, gustSpeed, rain, windDirection, batteryLow, _, e := outdoorWeatherBricklet.GetStationData(identifier)
+        temperature, humidity, windSpeed, gustSpeed, rain, windDirection, _, _, e := outdoorWeatherBricklet.GetStationData(identifier)
         if e != nil {
-            fmt.Println(e.Error())
+            return nil, e
         }
 
         result[i] = convertWeatherData(time.Now().In(location), temperature, humidity, windSpeed, gustSpeed, rain, windDirection)
-
-        if batteryLow {
-            fmt.Println("Battery low!")
-        }
     }
-    return result
+    return result, nil
 }
 
 func reconnect() (*outdoor_weather_bricklet.OutdoorWeatherBricklet, *ipconnection.IPConnection) {

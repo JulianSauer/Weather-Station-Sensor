@@ -22,7 +22,11 @@ func main() {
 
     _, e := c.AddFunc(cronConfig.Cron, func() {
         checkCache()
-        messages := collectData()
+        messages, e := collectData()
+        if e != nil {
+            fmt.Println("Could not read sensor data")
+            fmt.Println(e.Error())
+        }
         if messages != nil {
             sns.PublishSensorData(messages)
         }
@@ -33,7 +37,12 @@ func main() {
     }
 
     _, e = c.AddFunc(cronConfig.CronBattery, func() {
-        if weather.BatteryIsLow() {
+        batteryLow, e := weather.BatteryIsLow()
+        if e != nil {
+            fmt.Println("Could not ready battery state")
+            fmt.Println(e.Error())
+        }
+        if batteryLow {
             sns.PublishLowBattery()
         }
     })
@@ -51,27 +60,27 @@ func main() {
     <-sig
 }
 
-func collectData() *[]string {
-    weatherData := weather.GetWeatherData()
-    if weatherData == nil {
-        return nil
+func collectData() (*[]string, error) {
+    weatherData, e := weather.GetWeatherData()
+    if e != nil {
+        return nil, e
     }
     weatherDataAsJson := make([]string, len(weatherData) * 2)
     for i := 0; i + 1 < len(weatherDataAsJson); i += 2 {
         jsonBytes, e := json.Marshal(weatherData[i])
         if e != nil {
-            fmt.Println(e.Error())
+            return nil, e
         }
         weatherDataAsJson[i] = string(jsonBytes)
 
         weatherData[i].Timestamp = "latest"
         jsonBytes, e = json.Marshal(weatherData[i])
         if e != nil {
-            fmt.Println(e.Error())
+            return nil, e
         }
         weatherDataAsJson[i + 1] = string(jsonBytes)
     }
-    return &weatherDataAsJson
+    return &weatherDataAsJson, nil
 }
 
 func checkCache() {
