@@ -2,8 +2,8 @@ package sns
 
 import (
     "fmt"
-    "github.com/JulianSauer/Weather-Station-Pi/cache"
-    "github.com/JulianSauer/Weather-Station-Pi/config"
+    "github.com/JulianSauer/Weather-Station-Sensor/cache"
+    "github.com/JulianSauer/Weather-Station-Sensor/config"
     "github.com/aws/aws-sdk-go/aws"
     "github.com/aws/aws-sdk-go/aws/session"
     "github.com/aws/aws-sdk-go/service/sns"

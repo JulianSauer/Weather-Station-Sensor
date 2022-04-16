@@ -3,8 +3,8 @@ package weather
 import (
     "errors"
     "fmt"
-    "github.com/JulianSauer/Weather-Station-Pi/config"
-    "github.com/JulianSauer/Weather-Station-Pi/dto"
+    "github.com/JulianSauer/Weather-Station-Sensor/config"
+    "github.com/JulianSauer/Weather-Station-Sensor/dto"
     "github.com/Tinkerforge/go-api-bindings/ipconnection"
     "github.com/Tinkerforge/go-api-bindings/outdoor_weather_bricklet"
     "os"

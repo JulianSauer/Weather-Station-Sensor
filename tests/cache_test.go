@@ -2,7 +2,7 @@ package tests
 
 import (
     "bufio"
-    "github.com/JulianSauer/Weather-Station-Pi/cache"
+    "github.com/JulianSauer/Weather-Station-Sensor/cache"
     "io/ioutil"
     "os"
     "strings"

@@ -3,9 +3,9 @@ package main
 import (
     "encoding/json"
     "fmt"
-    "github.com/JulianSauer/Weather-Station-Pi/cache"
-    "github.com/JulianSauer/Weather-Station-Pi/sns"
-    "github.com/JulianSauer/Weather-Station-Pi/weather"
+    "github.com/JulianSauer/Weather-Station-Sensor/cache"
+    "github.com/JulianSauer/Weather-Station-Sensor/sns"
+    "github.com/JulianSauer/Weather-Station-Sensor/weather"
     "time"
 )
 
