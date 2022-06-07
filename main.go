@@ -4,8 +4,8 @@ import (
     "encoding/json"
     "fmt"
     "github.com/JulianSauer/Weather-Station-Sensor/cache"
+    "github.com/JulianSauer/Weather-Station-Sensor/sensor"
     "github.com/JulianSauer/Weather-Station-Sensor/sns"
-    "github.com/JulianSauer/Weather-Station-Sensor/weather"
     "time"
 )
 
@@ -14,13 +14,15 @@ func main() {
     timestamp := time.Now().In(location).Format("02 January 2006 15:04:05")
     fmt.Printf("Starting Weather Station at %s\n", timestamp)
 
-    publishSensorData()
-    checkBattery()
+    s := sensor.GetSensor()
+
+    publishSensorData(s)
+    checkBattery(s)
 }
 
-func publishSensorData() {
+func publishSensorData(s sensor.Sensor) {
     checkCache()
-    messages, e := collectData()
+    messages, e := collectData(s)
     if e != nil {
         fmt.Println("Could not read sensor data")
         fmt.Println(e.Error())
@@ -30,8 +32,8 @@ func publishSensorData() {
     }
 }
 
-func checkBattery() {
-    batteryLow, e := weather.BatteryIsLow()
+func checkBattery(s sensor.Sensor) {
+    batteryLow, e := s.BatteryIsLow()
     if e != nil {
         fmt.Println("Could not ready battery state")
         fmt.Println(e.Error())
@@ -41,8 +43,8 @@ func checkBattery() {
     }
 }
 
-func collectData() (*[]string, error) {
-    weatherData, e := weather.GetWeatherData()
+func collectData(s sensor.Sensor) (*[]string, error) {
+    weatherData, e := s.GetWeatherData()
     if e != nil {
         return nil, e
     }

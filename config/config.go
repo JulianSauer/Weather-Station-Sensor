@@ -9,11 +9,14 @@ import (
 const CONFIG_NAME = "config.json"
 
 type Config struct {
-    WeatherStationAddress string `json:"weatherStationAddress"`
-    WeatherStationPort    string `json:"weatherStationPort"`
-    WeatherStationUID     string `json:"weatherStationUID"`
-    AWSSNSWeatherTopic    string `json:"AWS-SNS-Weather-Topic"`
-    AWSSNSBatteryTopic    string `json:"AWS-SNS-Battery-Topic"`
+    SensorType                       string `json:"sensorType"`
+    TinkerforgeWeatherStationAddress string `json:"tinkerforgeWeatherStationAddress"`
+    TinkerforgeWeatherStationPort    string `json:"tinkerforgeWeatherStationPort"`
+    TinkerforgeWeatherStationUID     string `json:"tinkerforgeWeatherStationUID"`
+    MobileAlertsUrl                  string `json:"mobileAlertsUrl"`
+    MobileAlertsDeviceId             string `json:"mobileAlertsDeviceId"`
+    AWSSNSWeatherTopic               string `json:"AWS-SNS-Weather-Topic"`
+    AWSSNSBatteryTopic               string `json:"AWS-SNS-Battery-Topic"`
 }
 
 func Load() *Config {

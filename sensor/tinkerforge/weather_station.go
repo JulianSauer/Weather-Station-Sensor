@@ -1,4 +1,4 @@
-package weather
+package tinkerforge
 
 import (
     "errors"
@@ -16,10 +16,12 @@ var uid string
 var location *time.Location
 var identifiers []uint8
 
-func init() {
+type TfSensor struct {}
+
+func (tfSensor TfSensor) Setup() {
     configuration := config.Load()
-    address = configuration.WeatherStationAddress + ":" + configuration.WeatherStationPort
-    uid = configuration.WeatherStationUID
+    address = configuration.TinkerforgeWeatherStationAddress + ":" + configuration.TinkerforgeWeatherStationPort
+    uid = configuration.TinkerforgeWeatherStationUID
     location, _ = time.LoadLocation("Europe/Berlin")
     fmt.Println("Connecting to weather sensor")
     outdoorWeatherBricklet, connection := reconnect()
@@ -35,7 +37,7 @@ func init() {
     }
 }
 
-func BatteryIsLow() (bool, error) {
+func (tfSensor TfSensor) BatteryIsLow() (bool, error) {
     fmt.Println("Checking battery")
     outdoorWeatherBricklet, connection := reconnect()
     defer disconnect(connection)
@@ -55,7 +57,7 @@ func BatteryIsLow() (bool, error) {
     return false, nil
 }
 
-func GetWeatherData() ([]dto.WeatherData, error) {
+func (tfSensor TfSensor) GetWeatherData() ([]dto.WeatherData, error) {
     fmt.Println("Checking sensor data")
     result := make([]dto.WeatherData, len(identifiers))
     outdoorWeatherBricklet, connection := reconnect()
