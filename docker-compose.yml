@@ -1,0 +1,9 @@
+version: '3.6'
+services:
+  weather-station-sensor:
+    image: weather-sensor:latest
+    build: .
+    restart: always
+    volumes:
+      - ${PWD}/config.json:/root/config.json
+      - ${PWD}/WeatherStationCache.json:/root/WeatherStationCache.json

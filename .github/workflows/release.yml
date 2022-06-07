@@ -1,4 +1,10 @@
 name: Build binaries
+
+env:
+  IMAGE_NAME: weather-station-sensor
+  REGISTRY_USER: JulianSauer
+  REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+
 on: [ push ]
 jobs:
   publish:
@@ -21,3 +27,16 @@ jobs:
         with:
           name: weather-station-artifacts
           path: artifacts/
+
+      - name: Build image
+        run: docker build --tag $IMAGE_NAME .
+      - name: Log into registry
+        run: docker login docker.pkg.github.com --username "$REGISTRY_USER" -p "$REGISTRY_PASSWORD"
+      - name: Push image
+        run: |
+          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+          docker tag $IMAGE_NAME $IMAGE_ID:latest
+          docker tag $IMAGE_NAME $IMAGE_ID:$GITHUB_SHA
+          docker push $IMAGE_ID:latest
+          docker push $IMAGE_ID:$GITHUB_SHA
